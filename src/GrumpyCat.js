@@ -42,15 +42,21 @@ export class GrumpyCat extends Component {
       filter((e) => e.target.matches('.🐟, .🌭, .🍔')),
     ),
     this.result$.pipe(
-      filter(foods => foods.includes('pizza emoji'))
+      filter(foods => foods.includes('burger response') || foods.includes('hot dog response') || foods.includes('goldfish response'))
     )
   ).pipe(
     scan(count => count + 1, 0)
   );
 
-  counterYou$ = this.increment$.pipe(
+  counterYou$ = merge(
+    this.increment$.pipe(
     filter(({ clientX, clientY }) => this.hasBeenFedToGrumpyCat(clientX, clientY)),
     filter(e => e.target.matches('.🍟, .🍕, .🍩, .🌮')),
+  ),
+    this.result$.pipe(
+      filter(foods => foods.includes('pizza response') || foods.includes('fries response') || foods.includes('donut response') || foods.includes('taco response'))
+    )
+  ).pipe(
     scan(count => count + 1, 0)
   );
 
@@ -105,11 +111,12 @@ export class GrumpyCat extends Component {
         <div className="text-white text-center">
           <h1>
             THE GRUMPY CAT GAME
+            {stream(this.result$)}
           </h1>
         </div>
         <div className="text-center">
           <input onChange={this.didChangeSearchValue} /> <button onClick={this.didSubmitSearch} disabled={!this.state.searchValue}>submit</button>
-          <h1 style={{ color: 'white' }}>hey you like {stream(this.result$)} eh?</h1>
+          
         </div>
         <div>
           <img className="😸" src={grumpycatno} alt="grumpy cat" />
@@ -131,6 +138,11 @@ export class GrumpyCat extends Component {
         </div>
         <div className="counter-cat">{stream(this.counterCat$)}</div>
         <div className="counter-you">{stream(this.counterYou$)}</div>
+        <div class="text-white rules">
+          <p>HOW TO PLAY: Use the search bar to find foods or drag and drop into the bowl!</p>
+          <p>RULES: Feed Grumpy Cat something she likes, get a point. Feed Grumpy Cat something she does not like - she gets a point.</p> 
+          <p>HOW TO WIN: Whomever gets to 3 points first wins!</p>
+        </div>
       </div>
     );
   }
